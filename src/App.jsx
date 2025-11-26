@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { VaultProvider } from './context/VaultContext';
+import { PhaseProvider } from './context/PhaseContext';
 import { AuthProvider } from './context/AuthContext';
 import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -14,23 +15,25 @@ function App() {
   return (
     <AuthProvider>
       <VaultProvider>
-        <Router>
-          <ScrollToTop />
-          <Routes>
-            <Route path="/" element={<Vault />} />
-            <Route path="/how" element={<HowItWorks />} />
-            <Route path="/vault/:id" element={<VaultDetail />} />
-            <Route path="/login" element={<Login />} />
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </Router>
+        <PhaseProvider>
+          <Router>
+            <ScrollToTop />
+            <Routes>
+              <Route path="/" element={<Vault />} />
+              <Route path="/how" element={<HowItWorks />} />
+              <Route path="/vault/:id" element={<VaultDetail />} />
+              <Route path="/login" element={<Login />} />
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </Router>
+        </PhaseProvider>
       </VaultProvider>
     </AuthProvider>
   );
