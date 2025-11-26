@@ -110,20 +110,33 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
             : 'https://api.devnet.solana.com';
 
         const connection = new Connection(rpcUrl);
-        const mintAddress = TOKENS[network].solana[token];
-        const mintPubkey = new PublicKey(mintAddress);
 
-        console.log('Target Address:', targetAddress); // Debugging
+        const mintAddress = TOKENS[network].solana[token];
+        let mintPubkey;
+        try {
+            mintPubkey = new PublicKey(mintAddress);
+        } catch (err) {
+            throw new Error(`Invalid Mint Address configuration for ${token}: ${mintAddress}`);
+        }
+
+        const cleanedTargetAddress = targetAddress ? targetAddress.trim() : '';
+        console.log('Target Address (Cleaned):', cleanedTargetAddress);
 
         let destPubkey;
         try {
-            destPubkey = new PublicKey(targetAddress);
+            destPubkey = new PublicKey(cleanedTargetAddress);
         } catch (err) {
-            console.error('Invalid target address:', targetAddress, err);
-            throw new Error(`Invalid Solana address: "${targetAddress}". Please check the vault settings.`);
+            console.error('Invalid target address:', cleanedTargetAddress, err);
+            throw new Error(`Invalid Destination Address: "${cleanedTargetAddress}". Check vault settings.`);
         }
 
-        const senderPubkey = new PublicKey(wallet.address);
+        let senderPubkey;
+        try {
+            senderPubkey = new PublicKey(wallet.address);
+        } catch (err) {
+            console.error('Invalid wallet address:', wallet.address, err);
+            throw new Error(`Invalid Connected Wallet Address: "${wallet.address}"`);
+        }
 
         const senderATA = await getAssociatedTokenAddress(mintPubkey, senderPubkey);
         const receiverATA = await getAssociatedTokenAddress(mintPubkey, destPubkey);
