@@ -17,6 +17,19 @@ const Vault = () => {
     const additional = vaults.filter(v => v.category === 'additional');
     const guarantor = vaults.filter(v => v.category === 'guarantor');
 
+    // Gradient mapping for specific vaults
+    const getGradient = (code) => {
+        switch (code) {
+            // NMCXO: High Contrast Blue-Grey (Brighter start, Darker end)
+            case 'NMCXO': return 'bg-[linear-gradient(135deg,_#64748b_0%,_#020617_100%)]';
+            // NMCUS: Dark with Red Diagonal Beam
+            case 'NMCUS': return 'bg-[linear-gradient(115deg,_#09090b_0%,_#3f0e0e_50%,_#09090b_100%)]';
+            // NMCCP: Subtle zinc/grey glow from top-left
+            case 'NMCCP': return 'bg-[radial-gradient(circle_at_0%_0%,_#27272a_0%,_transparent_50%)]'; // zinc-800
+            default: return null;
+        }
+    };
+
     return (
         <Layout>
             <div className="max-w-7xl mx-auto px-6 pb-20">
@@ -45,9 +58,8 @@ const Vault = () => {
                                 onClick={() => handleVaultClick(flagship.id)}
                                 className="relative overflow-hidden rounded-sm border border-white/10 min-h-[300px] flex items-center p-8 md:p-12 group cursor-pointer hover:border-white/20 transition-colors"
                             >
-                                {/* Abstract Background Gradient */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-[#1a1a1a] via-[#2a2a2a] to-[#1a1a1a] opacity-80"></div>
-                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gold/10 via-transparent to-transparent opacity-50"></div>
+                                {/* Abstract Background Gradient - Custom Sampled Colors (Diagonal Reversed) */}
+                                <div className="absolute inset-0 bg-[linear-gradient(225deg,_#0a0a0a_0%,_#4a2c1d_45%,_#1f1f1f_100%)] opacity-80"></div>
 
                                 <div className="relative z-10 w-full flex flex-col md:flex-row justify-between items-end">
                                     <div className="max-w-xl">
@@ -84,6 +96,7 @@ const Vault = () => {
                                 description={vault.description}
                                 apy={vault.apy}
                                 incentivized={vault.incentivized}
+                                gradient={getGradient(vault.code)}
                                 onClick={() => handleVaultClick(vault.id)}
                             />
                         ))}

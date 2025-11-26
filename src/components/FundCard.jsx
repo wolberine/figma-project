@@ -7,6 +7,7 @@ const FundCard = ({
     apy,
     incentivized = false,
     image = null,
+    gradient = null,
     wide = false,
     onClick
 }) => {
@@ -15,6 +16,11 @@ const FundCard = ({
             onClick={onClick}
             className={`group relative overflow-hidden bg-surface border border-white/5 hover:border-white/10 transition-all duration-300 cursor-pointer ${wide ? 'col-span-1 md:col-span-3 min-h-[300px]' : 'col-span-1 min-h-[280px]'}`}
         >
+
+            {/* Custom Gradient (if any) */}
+            {gradient && (
+                <div className={`absolute inset-0 z-0 ${gradient} opacity-25 transition-opacity duration-500`}></div>
+            )}
 
             {/* Background Image (if any) */}
             {image && (
