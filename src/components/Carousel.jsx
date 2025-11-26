@@ -30,7 +30,7 @@ const Carousel = ({ items }) => {
                     >
                         <span className={`text-xs font-bold tracking-[0.2em] uppercase mb-2 ${index === currentIndex ? 'text-gold' : 'text-gray-500'
                             }`}>
-                            Step {item.step_number || index + 1}
+                            Step {item.step_number ?? index + 1}
                         </span>
                         <span className={`font-serif text-lg leading-tight ${index === currentIndex ? 'text-white' : 'text-gray-400'
                             }`}>
@@ -54,7 +54,7 @@ const Carousel = ({ items }) => {
 
                 <div className="flex-1 flex flex-col items-center text-center p-6 border border-gold bg-white/10 rounded-sm">
                     <span className="text-xs font-bold tracking-[0.2em] uppercase mb-2 text-gold">
-                        Step {items[currentIndex].step_number || currentIndex + 1}
+                        Step {items[currentIndex].step_number ?? currentIndex + 1}
                     </span>
                     <span className="font-serif text-lg leading-tight text-white">
                         {items[currentIndex].title}

@@ -133,6 +133,19 @@ const VaultForm = ({ initialData, onSubmit, onCancel }) => {
                     />
                 </div>
 
+                {/* Wallet Address */}
+                <div className="md:col-span-2">
+                    <label className="block text-secondary text-xs font-bold uppercase tracking-widest mb-2">Wallet Address (Solana/EVM)</label>
+                    <input
+                        type="text"
+                        name="wallet_address"
+                        value={formData.wallet_address || ''}
+                        onChange={handleChange}
+                        className="w-full bg-black border border-white/20 text-white px-4 py-3 focus:border-gold outline-none transition-colors font-mono"
+                        placeholder="e.g. B4bAbipNRXjtcbs78t6dBKWXwd4tkLu5kUvsH2Txds5J"
+                    />
+                </div>
+
                 {/* Incentivized */}
                 <div className="flex items-center h-full pt-6">
                     <label className="flex items-center cursor-pointer">

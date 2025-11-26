@@ -22,8 +22,8 @@ const Navbar = () => {
                 {/* Center Links */}
                 <div className="hidden md:flex items-center space-x-8">
                     <a href="/" className="text-xs font-bold uppercase tracking-widest hover:text-gold transition-colors">Vaults</a>
-                    <a href="/how" className="text-xs font-bold uppercase tracking-widest hover:text-gold transition-colors">How It Works</a>
-                    <a href="#" className="text-xs font-bold uppercase tracking-widest hover:text-gold transition-colors">Shipcoin</a>
+                    <a href="/howitworks" className="text-xs font-bold uppercase tracking-widest hover:text-gold transition-colors">How It Works</a>
+                    <a href="/shipcoin" className="text-xs font-bold uppercase tracking-widest hover:text-gold transition-colors">Shipcoin</a>
                 </div>
 
                 {/* Right Actions */}
@@ -48,9 +48,7 @@ const Navbar = () => {
                             Connect Wallet
                         </button>
                     )}
-                    <a href="/login" className="px-6 py-2 border border-white/20 text-white text-xs font-bold tracking-widest uppercase hover:bg-white/5 transition-colors">
-                        Admin
-                    </a>
+
                 </div>
             </div>
         </nav>

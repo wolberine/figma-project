@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { useVaults } from '../context/VaultContext';
+import TransferFunds from '../components/TransferFunds';
 
 const VaultDetail = () => {
     const { id } = useParams();
     const { getVault, loading } = useVaults();
+    const [showTransferModal, setShowTransferModal] = useState(false);
 
     const vaultData = getVault(id);
 
@@ -27,7 +29,7 @@ const VaultDetail = () => {
 
     return (
         <Layout>
-            <div className="max-w-7xl mx-auto px-6 pb-20 pt-10">
+            <div className="max-w-7xl mx-auto px-6 pb-20 pt-10 relative">
                 {/* Breadcrumb / Back */}
                 <Link to="/" className="inline-flex items-center text-secondary hover:text-white transition-colors mb-8 text-xs font-bold tracking-widest uppercase">
                     ← Back to Vaults
@@ -81,7 +83,10 @@ const VaultDetail = () => {
                             <h3 className="font-serif italic text-2xl mb-6">Manage Position</h3>
 
                             <div className="flex gap-4 mb-6">
-                                <button className="flex-1 py-3 bg-white text-black text-xs font-bold tracking-widest uppercase hover:bg-gray-200 transition-colors">
+                                <button
+                                    onClick={() => setShowTransferModal(true)}
+                                    className="flex-1 py-3 bg-white text-black text-xs font-bold tracking-widest uppercase hover:bg-gray-200 transition-colors"
+                                >
                                     Deposit
                                 </button>
                                 <button className="flex-1 py-3 bg-white/5 text-white text-xs font-bold tracking-widest uppercase hover:bg-white/10 transition-colors">
@@ -127,6 +132,18 @@ const VaultDetail = () => {
 
                     </div>
                 </div>
+
+                {/* Transfer Modal */}
+                {showTransferModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+                        <div className="w-full max-w-5xl animate-in zoom-in-95 duration-200">
+                            <TransferFunds
+                                destinationAddress={vaultData.wallet_address}
+                                onClose={() => setShowTransferModal(false)}
+                            />
+                        </div>
+                    </div>
+                )}
             </div>
         </Layout>
     );
