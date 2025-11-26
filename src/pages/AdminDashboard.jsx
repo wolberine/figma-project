@@ -5,14 +5,24 @@ import PhaseForm from '../components/PhaseForm';
 import PhaseList from '../components/PhaseList';
 import { useVaults } from '../context/VaultContext';
 import { usePhases } from '../context/PhaseContext';
+import { useAuth } from '../context/AuthContext';
 
 const AdminDashboard = () => {
+    const { logout } = useAuth();
     const { vaults, addVault, updateVault, deleteVault } = useVaults();
     const { addPhase, updatePhase } = usePhases();
     const [activeTab, setActiveTab] = useState('vaults'); // 'vaults' or 'carousel'
     const [isEditing, setIsEditing] = useState(false);
     const [currentVault, setCurrentVault] = useState(null);
     const [currentPhase, setCurrentPhase] = useState(null);
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+        } catch (error) {
+            console.error('Failed to logout:', error);
+        }
+    };
 
     const handleCreate = () => {
         setCurrentVault(null);
@@ -58,7 +68,15 @@ const AdminDashboard = () => {
             <div className="max-w-7xl mx-auto px-6 py-20">
                 {/* Header with Tabs */}
                 <div className="mb-12">
-                    <h1 className="font-serif italic text-5xl mb-8">Admin Dashboard</h1>
+                    <div className="flex justify-between items-center mb-8">
+                        <h1 className="font-serif italic text-5xl">Admin Dashboard</h1>
+                        <button
+                            onClick={handleLogout}
+                            className="text-xs font-bold uppercase tracking-widest text-secondary hover:text-white transition-colors"
+                        >
+                            Logout
+                        </button>
+                    </div>
 
                     {/* Tab Navigation */}
                     <div className="flex gap-4 border-b border-white/10">
@@ -69,8 +87,8 @@ const AdminDashboard = () => {
                                 setCurrentPhase(null);
                             }}
                             className={`px-6 py-3 text-xs font-bold tracking-widest uppercase transition-colors ${activeTab === 'vaults'
-                                    ? 'border-b-2 border-gold text-gold'
-                                    : 'text-secondary hover:text-white'
+                                ? 'border-b-2 border-gold text-gold'
+                                : 'text-secondary hover:text-white'
                                 }`}
                         >
                             Vaults
@@ -82,8 +100,8 @@ const AdminDashboard = () => {
                                 setCurrentVault(null);
                             }}
                             className={`px-6 py-3 text-xs font-bold tracking-widest uppercase transition-colors ${activeTab === 'carousel'
-                                    ? 'border-b-2 border-gold text-gold'
-                                    : 'text-secondary hover:text-white'
+                                ? 'border-b-2 border-gold text-gold'
+                                : 'text-secondary hover:text-white'
                                 }`}
                         >
                             Carousel
