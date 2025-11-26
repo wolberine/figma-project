@@ -16,56 +16,69 @@ const Carousel = ({ items }) => {
     }
 
     return (
-        <div className="relative w-full max-w-4xl mx-auto z-10">
-            {/* Main Image Display */}
-            <div className="relative h-[400px] md:h-[600px] bg-black border border-white/20 overflow-hidden rounded-sm">
-                <img
-                    src={items[currentIndex].image}
-                    alt={items[currentIndex].title}
-                    className="w-full h-full object-contain"
-                />
-
-                {/* Overlay Content */}
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-8 pt-24">
-                    <h3 className="font-serif text-2xl text-white mb-2">{items[currentIndex].title}</h3>
-                    <p className="text-gray-300 font-sans max-w-2xl">{items[currentIndex].description}</p>
-                </div>
+        <div className="w-full max-w-6xl mx-auto z-10">
+            {/* Desktop Tab Navigation */}
+            <div className="hidden md:flex mb-12 gap-4">
+                {items.map((item, index) => (
+                    <button
+                        key={index}
+                        onClick={() => setCurrentIndex(index)}
+                        className={`flex-1 flex flex-col items-start p-6 text-left transition-all duration-300 border rounded-sm ${index === currentIndex
+                            ? 'bg-white/10 border-gold'
+                            : 'bg-transparent hover:bg-white/5 border-white/10'
+                            }`}
+                    >
+                        <span className={`text-xs font-bold tracking-[0.2em] uppercase mb-2 ${index === currentIndex ? 'text-gold' : 'text-gray-500'
+                            }`}>
+                            Step {item.step_number || index + 1}
+                        </span>
+                        <span className={`font-serif text-lg leading-tight ${index === currentIndex ? 'text-white' : 'text-gray-400'
+                            }`}>
+                            {item.title}
+                        </span>
+                    </button>
+                ))}
             </div>
 
-            {/* Navigation Controls */}
-            <div className="flex items-center justify-between mt-6">
+            {/* Mobile Navigation */}
+            <div className="flex md:hidden items-center justify-between mb-8 gap-4">
                 <button
                     onClick={prevSlide}
                     className="p-3 border border-white/20 hover:border-gold hover:text-gold transition-colors rounded-full text-white"
-                    aria-label="Previous slide"
+                    aria-label="Previous step"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                     </svg>
                 </button>
 
-                {/* Indicators */}
-                <div className="flex space-x-3">
-                    {items.map((_, index) => (
-                        <button
-                            key={index}
-                            onClick={() => setCurrentIndex(index)}
-                            className={`w-3 h-3 rounded-full transition-colors ${index === currentIndex ? 'bg-gold' : 'bg-white/20 hover:bg-white/50'
-                                }`}
-                            aria-label={`Go to slide ${index + 1}`}
-                        />
-                    ))}
+                <div className="flex-1 flex flex-col items-center text-center p-6 border border-gold bg-white/10 rounded-sm">
+                    <span className="text-xs font-bold tracking-[0.2em] uppercase mb-2 text-gold">
+                        Step {items[currentIndex].step_number || currentIndex + 1}
+                    </span>
+                    <span className="font-serif text-lg leading-tight text-white">
+                        {items[currentIndex].title}
+                    </span>
                 </div>
 
                 <button
                     onClick={nextSlide}
                     className="p-3 border border-white/20 hover:border-gold hover:text-gold transition-colors rounded-full text-white"
-                    aria-label="Next slide"
+                    aria-label="Next step"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                     </svg>
                 </button>
+            </div>
+
+            {/* Main Image Display */}
+            <div className="relative w-full aspect-[16/9] bg-black/50 border border-white/10 rounded-sm overflow-hidden">
+                <img
+                    src={items[currentIndex].image}
+                    alt={items[currentIndex].title}
+                    className="w-full h-full object-contain"
+                />
             </div>
         </div>
     );
