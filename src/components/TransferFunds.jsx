@@ -81,6 +81,19 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
             return;
         }
 
+        // Check for wallet/chain mismatch
+        const isEVMWallet = wallet.address.startsWith('0x');
+        if (chain === 'solana' && isEVMWallet) {
+            setStatus("Mismatch: You are connected with an Ethereum wallet but 'Solana' is selected. Please switch Chain to 'Ethereum' in settings.");
+            setLoading(false);
+            return;
+        }
+        if (chain === 'ethereum' && !isEVMWallet) {
+            setStatus("Mismatch: You are connected with a Solana wallet but 'Ethereum' is selected. Please switch Chain to 'Solana' in settings.");
+            setLoading(false);
+            return;
+        }
+
         setLoading(true);
         setStatus('Initiating transfer...');
 
@@ -238,7 +251,7 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
     };
 
     return (
-        <div className="w-full max-w-5xl mx-auto bg-[#0A0A0A] rounded-3xl overflow-hidden shadow-2xl border border-gray-800 relative min-h-[800px] flex flex-col">
+        <div className="w-full max-w-5xl mx-auto bg-[#0A0A0A] rounded-3xl overflow-hidden shadow-2xl border border-gray-800 relative min-h-[600px] md:min-h-[800px] flex flex-col">
             {/* Header */}
             <div className="flex justify-between items-center p-6 border-b border-gray-900/50">
                 <button
