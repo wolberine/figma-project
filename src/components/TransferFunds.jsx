@@ -366,7 +366,7 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
 
                 {/* Status Message */}
                 {status && (
-                    <div className={`mt-6 text-sm ${status.includes('failed') ? 'text-red-400' : 'text-green-400'} animate-in fade-in slide-in-from-bottom-2`}>
+                    <div className={`mt-6 text-sm ${status.includes('failed') ? 'text-red-400' : 'text-green-400'} animate-in fade-in slide-in-from-bottom-2 break-words break-all max-w-full max-h-32 overflow-y-auto px-4`}>
                         {status}
                     </div>
                 )}
