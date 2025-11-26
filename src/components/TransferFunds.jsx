@@ -112,7 +112,17 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
         const connection = new Connection(rpcUrl);
         const mintAddress = TOKENS[network].solana[token];
         const mintPubkey = new PublicKey(mintAddress);
-        const destPubkey = new PublicKey(targetAddress);
+
+        console.log('Target Address:', targetAddress); // Debugging
+
+        let destPubkey;
+        try {
+            destPubkey = new PublicKey(targetAddress);
+        } catch (err) {
+            console.error('Invalid target address:', targetAddress, err);
+            throw new Error(`Invalid Solana address: "${targetAddress}". Please check the vault settings.`);
+        }
+
         const senderPubkey = new PublicKey(wallet.address);
 
         const senderATA = await getAssociatedTokenAddress(mintPubkey, senderPubkey);
