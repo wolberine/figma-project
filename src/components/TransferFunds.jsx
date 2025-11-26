@@ -50,7 +50,7 @@ const ERC20_ABI = [
     },
 ];
 
-export default function TransferFunds({ destinationAddress, onClose }) {
+export default function TransferFunds({ solanaDestinationAddress, ethereumDestinationAddress, onClose }) {
     const { user, login } = usePrivy();
     const { wallets } = useWallets();
     const [network, setNetwork] = useState('mainnet');
@@ -61,8 +61,10 @@ export default function TransferFunds({ destinationAddress, onClose }) {
     const [status, setStatus] = useState('');
     const [showSettings, setShowSettings] = useState(false);
 
-    // Use prop address or fallback to default if not provided (for safety/demo)
-    const targetAddress = destinationAddress || SOLANA_DESTINATION;
+    // Determine target address based on selected chain
+    const targetAddress = chain === 'solana'
+        ? (solanaDestinationAddress || SOLANA_DESTINATION)
+        : (ethereumDestinationAddress || ETHEREUM_DESTINATION);
 
     // Calculate projected earnings (mock calculation: 14.4% APY)
     const projectedEarnings = amount ? (parseFloat(amount) * 0.14416).toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : '$0.00';

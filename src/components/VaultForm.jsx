@@ -133,17 +133,30 @@ const VaultForm = ({ initialData, onSubmit, onCancel }) => {
                     />
                 </div>
 
-                {/* Wallet Address */}
-                <div className="md:col-span-2">
-                    <label className="block text-secondary text-xs font-bold uppercase tracking-widest mb-2">Wallet Address (Solana/EVM)</label>
-                    <input
-                        type="text"
-                        name="wallet_address"
-                        value={formData.wallet_address || ''}
-                        onChange={handleChange}
-                        className="w-full bg-black border border-white/20 text-white px-4 py-3 focus:border-gold outline-none transition-colors font-mono"
-                        placeholder="e.g. B4bAbipNRXjtcbs78t6dBKWXwd4tkLu5kUvsH2Txds5J"
-                    />
+                {/* Wallet Addresses */}
+                <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label className="block text-secondary text-xs font-bold uppercase tracking-widest mb-2">Solana Wallet Address</label>
+                        <input
+                            type="text"
+                            name="solana_wallet_address"
+                            value={formData.solana_wallet_address || ''}
+                            onChange={handleChange}
+                            className="w-full bg-black border border-white/20 text-white px-4 py-3 focus:border-gold outline-none transition-colors font-mono text-sm"
+                            placeholder="e.g. B4bAb..."
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-secondary text-xs font-bold uppercase tracking-widest mb-2">Ethereum Wallet Address</label>
+                        <input
+                            type="text"
+                            name="ethereum_wallet_address"
+                            value={formData.ethereum_wallet_address || ''}
+                            onChange={handleChange}
+                            className="w-full bg-black border border-white/20 text-white px-4 py-3 focus:border-gold outline-none transition-colors font-mono text-sm"
+                            placeholder="e.g. 0x123..."
+                        />
+                    </div>
                 </div>
 
                 {/* Incentivized */}

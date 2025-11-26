@@ -138,7 +138,8 @@ const VaultDetail = () => {
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
                         <div className="w-full max-w-5xl animate-in zoom-in-95 duration-200">
                             <TransferFunds
-                                destinationAddress={vaultData.wallet_address}
+                                solanaDestinationAddress={vaultData.solana_wallet_address}
+                                ethereumDestinationAddress={vaultData.ethereum_wallet_address}
                                 onClose={() => setShowTransferModal(false)}
                             />
                         </div>
