@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import VaultForm from '../components/VaultForm';
 import PhaseForm from '../components/PhaseForm';
@@ -9,6 +10,7 @@ import { useAuth } from '../context/AuthContext';
 
 const AdminDashboard = () => {
     const { logout } = useAuth();
+    const navigate = useNavigate();
     const { vaults, addVault, updateVault, deleteVault } = useVaults();
     const { addPhase, updatePhase } = usePhases();
     const [activeTab, setActiveTab] = useState('vaults'); // 'vaults' or 'carousel'
@@ -19,6 +21,7 @@ const AdminDashboard = () => {
     const handleLogout = async () => {
         try {
             await logout();
+            navigate('/login');
         } catch (error) {
             console.error('Failed to logout:', error);
         }
