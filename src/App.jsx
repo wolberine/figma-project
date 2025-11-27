@@ -14,7 +14,7 @@ import HowItWorks from './pages/HowItWorks';
 import Shipcoin from './pages/Shipcoin';
 import TransferDemo from './pages/TransferDemo';
 
-import { mainnet, sepolia } from 'viem/chains';
+import { mainnet, sepolia, base } from 'viem/chains';
 
 function App() {
   return (
@@ -27,7 +27,7 @@ function App() {
           accentColor: '#D4AF37', // Gold color to match theme
           logo: 'https://your-logo-url', // Optional
         },
-        supportedChains: [mainnet, sepolia],
+        supportedChains: [mainnet, sepolia, base],
       }}
     >
       <AuthProvider>

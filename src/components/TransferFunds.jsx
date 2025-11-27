@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { Connection, PublicKey, Transaction } from '@solana/web3.js';
 import { createTransferInstruction, getAssociatedTokenAddress, createAssociatedTokenAccountInstruction } from '@solana/spl-token';
-import { createWalletClient, custom, parseUnits, encodeFunctionData } from 'viem';
-import { mainnet, sepolia } from 'viem/chains';
-import { XMarkIcon, ArrowRightIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
+import { createWalletClient, createPublicClient, http, custom, parseUnits, encodeFunctionData } from 'viem';
+import { mainnet, sepolia, base } from 'viem/chains';
+import { XMarkIcon, ArrowRightIcon, Cog6ToothIcon, CheckCircleIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 
 const SOLANA_DESTINATION = 'B4bAbipNRXjtcbs78t6dBKWXwd4tkLu5kUvsH2Txds5J';
 // TODO: Replace with actual Ethereum destination address
@@ -20,6 +20,10 @@ const TOKENS = {
             USDC: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
             USDT: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
         },
+        base: {
+            USDC: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+            USDT: '0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2',
+        }
     },
     testnet: {
         solana: {
@@ -34,6 +38,12 @@ const TOKENS = {
             // Sepolia USDT (Fake)
             USDT: '0x7169D38820dfd117C3FA1f22a697dBA58d90BA06',
         },
+        base: {
+            // Base Sepolia USDC
+            USDC: '0x036CbD53842c5426634e7929541eC2318f3dCF7e',
+            // Base Sepolia USDT (Fake/Placeholder)
+            USDT: '0x0000000000000000000000000000000000000000',
+        }
     }
 };
 
@@ -61,6 +71,10 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
     const [status, setStatus] = useState('');
     const [showSettings, setShowSettings] = useState(false);
 
+    // 'idle' | 'submitting' | 'submitted' | 'confirmed'
+    const [transferState, setTransferState] = useState('idle');
+    const [txHash, setTxHash] = useState('');
+
     // Determine target address based on selected chain
     const targetAddress = chain === 'solana'
         ? (solanaDestinationAddress || SOLANA_DESTINATION)
@@ -84,17 +98,18 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
         // Check for wallet/chain mismatch
         const isEVMWallet = wallet.address.startsWith('0x');
         if (chain === 'solana' && isEVMWallet) {
-            setStatus("Mismatch: You are connected with an Ethereum wallet but 'Solana' is selected. Please switch Chain to 'Ethereum' in settings.");
+            setStatus("Mismatch: You are connected with an Ethereum/Base wallet but 'Solana' is selected. Please switch Chain to 'Ethereum' or 'Base' in settings.");
             setLoading(false);
             return;
         }
-        if (chain === 'ethereum' && !isEVMWallet) {
-            setStatus("Mismatch: You are connected with a Solana wallet but 'Ethereum' is selected. Please switch Chain to 'Solana' in settings.");
+        if ((chain === 'ethereum' || chain === 'base') && !isEVMWallet) {
+            setStatus(`Mismatch: You are connected with a Solana wallet but '${chain === 'base' ? 'Base' : 'Ethereum'}' is selected. Please switch Chain to 'Solana' in settings.`);
             setLoading(false);
             return;
         }
 
         setLoading(true);
+        setTransferState('submitting');
         setStatus('Initiating transfer...');
 
         try {
@@ -106,6 +121,7 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
         } catch (error) {
             console.error('Transfer failed:', error);
             setStatus(`Transfer failed: ${error.message}`);
+            setTransferState('idle');
         } finally {
             setLoading(false);
         }
@@ -184,12 +200,31 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
         transaction.feePayer = senderPubkey;
 
         const { signature } = await wallet.sendTransaction(transaction, connection);
-        setStatus(`Transfer successful! Signature: ${signature}`);
+
+        setTxHash(signature);
+        setTransferState('submitted');
+        setStatus('Transaction submitted. Waiting for confirmation...');
+
+        const confirmation = await connection.confirmTransaction(signature, 'confirmed');
+        if (confirmation.value.err) {
+            throw new Error('Transaction failed to confirm');
+        }
+
+        setTransferState('confirmed');
+        setStatus('Transfer successful!');
     };
 
     const handleEthereumTransfer = async (wallet) => {
-        const targetChainId = network === 'mainnet' ? mainnet.id : sepolia.id;
-        const targetChain = network === 'mainnet' ? mainnet : sepolia;
+        let targetChainId;
+        let targetChain;
+
+        if (chain === 'base') {
+            targetChainId = network === 'mainnet' ? base.id : base.id;
+            targetChain = base;
+        } else {
+            targetChainId = network === 'mainnet' ? mainnet.id : sepolia.id;
+            targetChain = network === 'mainnet' ? mainnet : sepolia;
+        }
 
         await wallet.switchChain(targetChainId);
 
@@ -202,7 +237,14 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
             transport: custom(provider)
         });
 
-        const tokenAddress = TOKENS[network].ethereum[token];
+        const publicClient = createPublicClient({
+            chain: targetChain,
+            transport: http()
+        });
+
+        const tokenAddress = TOKENS[network][chain][token];
+        if (!tokenAddress) throw new Error(`Token ${token} not supported on ${chain} ${network}`);
+
         const amountBigInt = parseUnits(amount, 6);
 
         const data = encodeFunctionData({
@@ -218,7 +260,14 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
             chain: targetChain
         });
 
-        setStatus(`Transfer successful! Hash: ${hash}`);
+        setTxHash(hash);
+        setTransferState('submitted');
+        setStatus('Transaction submitted. Waiting for confirmation...');
+
+        await publicClient.waitForTransactionReceipt({ hash });
+
+        setTransferState('confirmed');
+        setStatus('Transfer successful!');
     };
 
     // Format amount for display
@@ -249,6 +298,76 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
 
         setAmount(value);
     };
+
+    const getExplorerLink = () => {
+        if (!txHash) return '#';
+        if (chain === 'solana') {
+            return `https://solscan.io/tx/${txHash}${network === 'testnet' ? '?cluster=devnet' : ''}`;
+        } else if (chain === 'base') {
+            return `https://basescan.org/tx/${txHash}`;
+        } else {
+            return `https://etherscan.io/tx/${txHash}${network === 'testnet' ? '?network=sepolia' : ''}`;
+        }
+    };
+
+    if (transferState === 'confirmed') {
+        return (
+            <div className="w-full max-w-5xl mx-auto bg-[#0A0A0A] rounded-3xl overflow-hidden shadow-2xl border border-gray-800 relative min-h-[600px] flex flex-col items-center justify-center p-8">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-green-900/10 blur-[100px] rounded-full pointer-events-none" />
+
+                <div className="w-24 h-24 bg-green-500/20 rounded-full flex items-center justify-center mb-6 animate-in zoom-in duration-300">
+                    <CheckCircleIcon className="w-12 h-12 text-green-500" />
+                </div>
+
+                <h2 className="text-3xl font-bold text-white mb-2">Funds Confirmed</h2>
+                <p className="text-gray-400 mb-8 text-center max-w-md">
+                    Your capital has been successfully onboarded. You can view the transaction details below.
+                </p>
+
+                <a
+                    href={getExplorerLink()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-2 text-[#D4AF37] hover:text-[#C5A028] transition-colors mb-12"
+                >
+                    <span>View Transaction</span>
+                    <ArrowTopRightOnSquareIcon className="w-4 h-4" />
+                </a>
+
+                <button
+                    onClick={onClose}
+                    className="bg-[#D4AF37] text-black px-12 py-3 rounded-full font-medium hover:bg-[#C5A028] transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.3)]"
+                >
+                    Done
+                </button>
+            </div>
+        );
+    }
+
+    if (transferState === 'submitted') {
+        return (
+            <div className="w-full max-w-5xl mx-auto bg-[#0A0A0A] rounded-3xl overflow-hidden shadow-2xl border border-gray-800 relative min-h-[600px] flex flex-col items-center justify-center p-8">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-blue-900/10 blur-[100px] rounded-full pointer-events-none" />
+
+                <div className="w-16 h-16 border-4 border-gray-800 border-t-[#D4AF37] rounded-full animate-spin mb-8"></div>
+
+                <h2 className="text-2xl font-bold text-white mb-2">Transaction Submitted</h2>
+                <p className="text-gray-400 mb-8 text-center max-w-md">
+                    Waiting for blockchain confirmation...
+                </p>
+
+                <a
+                    href={getExplorerLink()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-2 text-gray-500 hover:text-white transition-colors"
+                >
+                    <span>View on Explorer</span>
+                    <ArrowTopRightOnSquareIcon className="w-4 h-4" />
+                </a>
+            </div>
+        );
+    }
 
     return (
         <div className="w-full max-w-5xl mx-auto bg-[#0A0A0A] rounded-3xl overflow-hidden shadow-2xl border border-gray-800 relative min-h-[600px] md:min-h-[800px] flex flex-col">
@@ -285,6 +404,7 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
                         <div className="flex bg-black rounded-lg p-1">
                             <button onClick={() => setChain('solana')} className={`px-3 py-1 rounded text-xs ${chain === 'solana' ? 'bg-purple-900/30 text-purple-400' : 'text-gray-500'}`}>Solana</button>
                             <button onClick={() => setChain('ethereum')} className={`px-3 py-1 rounded text-xs ${chain === 'ethereum' ? 'bg-blue-900/30 text-blue-400' : 'text-gray-500'}`}>Ethereum</button>
+                            <button onClick={() => setChain('base')} className={`px-3 py-1 rounded text-xs ${chain === 'base' ? 'bg-blue-600/30 text-blue-400' : 'text-gray-500'}`}>Base</button>
                         </div>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -309,7 +429,7 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
                         </div>
                         <div className="space-y-2">
                             <div className="bg-[#1A1A1A] text-gray-300 text-sm p-4 rounded-2xl rounded-tl-none border border-gray-800 shadow-sm">
-                                <p>Welcome aboard. I'm Nelson, here to help you get your capital onboarded. We support {token} on {chain === 'solana' ? 'Solana' : 'ETH L1'}.</p>
+                                <p>Welcome aboard. I'm Nelson, here to help you get your capital onboarded. We support {token} on {chain === 'solana' ? 'Solana' : (chain === 'base' ? 'Base' : 'ETH L1')}.</p>
                             </div>
                             <div className="bg-[#1A1A1A] text-gray-300 text-sm p-4 rounded-2xl rounded-tl-none border border-gray-800 shadow-sm delay-150">
                                 <p>One onboard, we'll deploy this capital against shipments.</p>
