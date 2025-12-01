@@ -60,7 +60,7 @@ const ERC20_ABI = [
     },
 ];
 
-export default function TransferFunds({ solanaDestinationAddress, ethereumDestinationAddress, onClose }) {
+export default function TransferFunds({ solanaDestinationAddress, ethereumDestinationAddress, baseDestinationAddress, onClose }) {
     const { user, login } = usePrivy();
     const { wallets } = useWallets();
     const [network, setNetwork] = useState('mainnet');
@@ -76,9 +76,15 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
     const [txHash, setTxHash] = useState('');
 
     // Determine target address based on selected chain
-    const targetAddress = chain === 'solana'
-        ? (solanaDestinationAddress || SOLANA_DESTINATION)
-        : (ethereumDestinationAddress || ETHEREUM_DESTINATION);
+    let targetAddress;
+    if (chain === 'solana') {
+        targetAddress = solanaDestinationAddress || SOLANA_DESTINATION;
+    } else if (chain === 'base') {
+        // Fallback to Ethereum address if Base specific address is not provided
+        targetAddress = baseDestinationAddress || ethereumDestinationAddress || ETHEREUM_DESTINATION;
+    } else {
+        targetAddress = ethereumDestinationAddress || ETHEREUM_DESTINATION;
+    }
 
     // Calculate projected earnings (mock calculation: 14.4% APY)
     const projectedEarnings = amount ? (parseFloat(amount) * 0.14416).toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : '$0.00';
@@ -226,7 +232,11 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
             targetChain = network === 'mainnet' ? mainnet : sepolia;
         }
 
+        setStatus('Switching network...');
         await wallet.switchChain(targetChainId);
+
+        // Add a small delay to allow the wallet provider to fully update its state
+        await new Promise(resolve => setTimeout(resolve, 2000));
 
         const provider = await wallet.getEthereumProvider();
         const address = wallet.address;
@@ -234,7 +244,10 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
         const client = createWalletClient({
             account: address,
             chain: targetChain,
-            transport: custom(provider)
+            transport: custom(provider, {
+                retryCount: 3,
+                retryDelay: 1000
+            })
         });
 
         const publicClient = createPublicClient({
@@ -253,12 +266,27 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
             args: [targetAddress, amountBigInt]
         });
 
-        const hash = await client.sendTransaction({
-            account: address,
-            to: tokenAddress,
-            data: data,
-            chain: targetChain
-        });
+        setStatus('Requesting signature...');
+
+        // Retry logic for sending transaction
+        let hash;
+        let retries = 3;
+        while (retries > 0) {
+            try {
+                hash = await client.sendTransaction({
+                    account: address,
+                    to: tokenAddress,
+                    data: data,
+                    chain: targetChain
+                });
+                break;
+            } catch (error) {
+                console.warn(`Attempt failed, retries left: ${retries}`, error);
+                retries--;
+                if (retries === 0) throw error;
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+        }
 
         setTxHash(hash);
         setTransferState('submitted');

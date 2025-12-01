@@ -134,7 +134,7 @@ const VaultForm = ({ initialData, onSubmit, onCancel }) => {
                 </div>
 
                 {/* Wallet Addresses */}
-                <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                         <label className="block text-secondary text-xs font-bold uppercase tracking-widest mb-2">Solana Wallet Address</label>
                         <input
@@ -155,6 +155,17 @@ const VaultForm = ({ initialData, onSubmit, onCancel }) => {
                             onChange={handleChange}
                             className="w-full bg-black border border-white/20 text-white px-4 py-3 focus:border-gold outline-none transition-colors font-mono text-sm"
                             placeholder="e.g. 0x123..."
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-secondary text-xs font-bold uppercase tracking-widest mb-2">Base Wallet Address</label>
+                        <input
+                            type="text"
+                            name="base_wallet_address"
+                            value={formData.base_wallet_address || ''}
+                            onChange={handleChange}
+                            className="w-full bg-black border border-white/20 text-white px-4 py-3 focus:border-gold outline-none transition-colors font-mono text-sm"
+                            placeholder="e.g. 0x456..."
                         />
                     </div>
                 </div>

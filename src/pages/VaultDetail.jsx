@@ -141,6 +141,7 @@ const VaultDetail = () => {
                                 <TransferFunds
                                     solanaDestinationAddress={vaultData.solana_wallet_address}
                                     ethereumDestinationAddress={vaultData.ethereum_wallet_address}
+                                    baseDestinationAddress={vaultData.base_wallet_address}
                                     onClose={() => setShowTransferModal(false)}
                                 />
                             </div>
