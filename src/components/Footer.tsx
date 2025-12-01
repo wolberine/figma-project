@@ -6,11 +6,11 @@ const Footer: React.FC = () => {
             <div className="max-w-7xl mx-auto px-6">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
                     <div className="col-span-1 md:col-span-2">
-                        <div className="mb-8">
-                            <h3 className="text-gold font-serif italic text-xl mb-2">The new</h3>
-                            <h2 className="text-3xl text-green-800 font-serif tracking-wide mb-1">MONEY</h2>
-                            <h2 className="text-3xl text-green-800 font-serif tracking-wide mb-1">PRIVATE LTD</h2>
-                            <h4 className="text-green-800/60 font-serif italic">of SINGAPORE</h4>
+                        <div className="flex flex-col mb-8">
+                            <h3 className="text-green-800 font-serif italic text-xl">The new</h3>
+                            <h2 className="text-3xl text-green-800 font-serif tracking-wide">MONEY</h2>
+                            <h2 className="text-3xl text-green-800 font-serif tracking-wide">PRIVATE LTD</h2>
+                            <h4 className="text-green-800 font-serif italic">of SINGAPORE</h4>
                         </div>
                         <p className="text-secondary text-xs tracking-widest uppercase">
                             Actual results may vary

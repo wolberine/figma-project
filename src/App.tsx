@@ -25,7 +25,7 @@ function App() {
                 appearance: {
                     theme: 'dark',
                     accentColor: '#D4AF37', // Gold color to match theme
-                    logo: 'https://your-logo-url', // Optional
+                    logo: 'https://control.newmoneycompany.com/android-chrome-512x512.png', // Optional
                 },
                 supportedChains: [mainnet, sepolia, base],
             }}

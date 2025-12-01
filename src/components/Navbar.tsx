@@ -15,7 +15,7 @@ const Navbar: React.FC = () => {
                 {/* Logo */}
                 <div className="flex items-center gap-2">
                     <div className="text-2xl font-serif text-white tracking-wider">N</div>
-                    <div className="text-xs text-secondary tracking-[0.2em] uppercase hidden sm:block">
+                    <div className="text-xs text-secondary tracking-[0.2em] uppercase hidden sm:block font-kicker">
                         The New<br />Money Company
                     </div>
                 </div>

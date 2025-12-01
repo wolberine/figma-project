@@ -63,7 +63,7 @@ const Vault: React.FC = () => {
 
                                 <div className="relative z-10 w-full flex flex-col md:flex-row justify-between items-end">
                                     <div className="max-w-xl">
-                                        <div className="text-gold text-xs font-bold tracking-widest uppercase mb-4">{flagship.code}</div>
+                                        <div className="text-gold text-xs font-bold tracking-widest uppercase mb-4 font-kicker">{flagship.code}</div>
                                         <h3 className="font-mono text-3xl md:text-4xl text-white mb-4">{flagship.title}</h3>
                                         <p className="text-secondary text-sm leading-relaxed">
                                             {flagship.description}
@@ -72,7 +72,7 @@ const Vault: React.FC = () => {
 
                                     <div className="mt-8 md:mt-0 text-right">
                                         {flagship.incentivized && (
-                                            <div className="text-[10px] text-secondary uppercase tracking-widest mb-2">Incentivized Earning</div>
+                                            <div className="text-[10px] text-secondary uppercase tracking-widest mb-2 font-kicker">Incentivized Earning</div>
                                         )}
                                         <div className="text-3xl font-mono text-white">
                                             {flagship.apy} <span className="text-sm text-secondary">APY</span>
@@ -141,7 +141,7 @@ const Vault: React.FC = () => {
 
                 {/* CTA Section */}
                 <div className="py-20 border-t border-white/10">
-                    <div className="text-xs font-bold tracking-widest uppercase text-secondary mb-4">We're the New Money Company</div>
+                    <div className="text-xs font-bold tracking-widest uppercase text-secondary mb-4 font-kicker">We're the New Money Company</div>
                     <h2 className="font-serif italic text-5xl md:text-7xl mb-12 max-w-4xl">
                         Creating a new dawn of economic possibility
                     </h2>

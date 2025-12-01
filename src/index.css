@@ -3,7 +3,150 @@
 @tailwind utilities;
 
 @layer base {
+
+  /* SANS */
+  /* @font-face {
+    font-family: "suisse-intl";
+    src: url("/fonts/suisse/SuisseIntl-UltraLight.otf") format("opentype");
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+  } */
+  /* @font-face {
+    font-family: "suisse-intl";
+    src: url("/fonts/suisse/SuisseIntl-Thin.otf") format("opentype");
+    font-weight: 200;
+    font-style: normal;
+    font-display: swap;
+  } */
+  @font-face {
+    font-family: "suisse-intl";
+    src: url("/fonts/suisse/SuisseIntl-Light.otf") format("opentype");
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "suisse-intl";
+    src: url("/fonts/suisse/SuisseIntl-Regular.otf") format("opentype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "suisse-intl";
+    src: url("/fonts/suisse/SuisseIntl-Book.otf") format("opentype");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "suisse-intl";
+    src: url("/fonts/suisse/SuisseIntl-Medium.otf") format("opentype");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* @font-face {
+    font-family: "suisse-intl";
+    src: url("/fonts/suisse/SuisseIntl-SemiBold.otf") format("opentype");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  } */
+  /* @font-face {
+    font-family: "suisse-intl";
+    src: url("/fonts/suisse/SuisseIntl-Bold.otf") format("opentype");
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+  } */
+  /* @font-face {
+    font-family: "suisse-intl";
+    src: url("/fonts/suisse/SuisseIntl-Black.otf") format("opentype");
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+  } */
+
+  /* MONO */
+  /* @font-face {
+    font-family: "suisse-intl-mono";
+    src: url("/fonts/suisse/SuisseIntlMono-Thin.otf") format("opentype");
+    font-weight: 200;
+    font-style: normal;
+    font-display: swap;
+  } */
+  @font-face {
+    font-family: "suisse-intl-mono";
+    src: url("/fonts/suisse/SuisseIntlMono-Regular.otf") format("opentype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* @font-face {
+    font-family: "suisse-intl-mono";
+    src: url("/fonts/suisse/SuisseIntlMono-Bold.otf") format("opentype");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+  } */
+
+  /* SERIF */
+  /* @font-face {
+    font-family: "suisse-works";
+    src: url("/fonts/suisse/SuisseWorks-Regular.otf") format("opentype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  } */
+  @font-face {
+    font-family: "suisse-works";
+    src: url("/fonts/suisse/SuisseWorks-Book.otf") format("opentype");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* @font-face {
+    font-family: "suisse-works";
+    src: url("/fonts/suisse/SuisseWorks-Medium.otf") format("opentype");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+  } */
+  /* @font-face {
+    font-family: "suisse-works";
+    src: url("/fonts/suisse/SuisseWorks-Bold.otf") format("opentype");
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+  } */
+
+  /* GOTHIC */
+  @font-face {
+    font-family: "bank-gothic";
+    src: url("/fonts/bank-gothic/BankGothicLtBT.otf") format("opentype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* @font-face {
+    font-family: "bank-gothic";
+    src: url("/fonts/bank-gothic/BankGothicMdBT.otf") format("opentype");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+  } */
+
+
   body {
-    @apply bg-background text-white antialiased;
+    @apply bg-background text-white antialiased font-sans;
   }
 }

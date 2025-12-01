@@ -7,7 +7,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Outfit', 'sans-serif'],
+        sans: ['suisse-intl', 'sans-serif'],
+        mono: ['suisse-intl-mono', 'monospace'],
+        kicker: ['bank-gothic', 'sans-serif'],
         serif: ['Playfair Display', 'serif'],
       },
       colors: {

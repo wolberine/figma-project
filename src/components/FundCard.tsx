@@ -44,7 +44,7 @@ const FundCard: React.FC<FundCardProps> = ({
 
             <div className="relative z-20 p-8 h-full flex flex-col justify-between">
                 <div>
-                    <div className="text-gold text-xs font-bold tracking-widest uppercase mb-2">{code}</div>
+                    <div className="text-gold text-xs font-bold tracking-widest uppercase mb-2 font-kicker">{code}</div>
                     <h3 className={`font-mono text-2xl text-white mb-4 ${wide ? 'max-w-md' : ''}`}>{title}</h3>
                     <p className="text-secondary text-sm leading-relaxed max-w-sm">{description}</p>
                 </div>
@@ -52,7 +52,7 @@ const FundCard: React.FC<FundCardProps> = ({
                 <div className="mt-8 pt-6 border-t border-white/10 flex items-end justify-between">
                     <div>
                         {incentivized && (
-                            <div className="text-[10px] text-secondary uppercase tracking-widest mb-1">Incentivized Earning</div>
+                            <div className="text-[10px] text-secondary uppercase tracking-widest mb-1 font-kicker">Incentivized Earning</div>
                         )}
                         <div className="text-xl font-mono text-white">
                             {apy} <span className="text-sm text-secondary">APY</span>
