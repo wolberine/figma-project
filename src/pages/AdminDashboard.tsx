@@ -7,16 +7,22 @@ import PhaseList from '../components/PhaseList';
 import { useVaults } from '../context/VaultContext';
 import { usePhases } from '../context/PhaseContext';
 import { useAuth } from '../context/AuthContext';
+import { Database } from '../types/supabase';
 
-const AdminDashboard = () => {
+type Vault = Database['public']['Tables']['vaults']['Row'];
+type VaultInsert = Database['public']['Tables']['vaults']['Insert'];
+type Phase = Database['public']['Tables']['phases']['Row'];
+type PhaseInsert = Database['public']['Tables']['phases']['Insert'];
+
+const AdminDashboard: React.FC = () => {
     const { logout } = useAuth();
     const navigate = useNavigate();
     const { vaults, addVault, updateVault, deleteVault } = useVaults();
     const { addPhase, updatePhase } = usePhases();
-    const [activeTab, setActiveTab] = useState('vaults'); // 'vaults' or 'carousel'
+    const [activeTab, setActiveTab] = useState<'vaults' | 'carousel'>('vaults');
     const [isEditing, setIsEditing] = useState(false);
-    const [currentVault, setCurrentVault] = useState(null);
-    const [currentPhase, setCurrentPhase] = useState(null);
+    const [currentVault, setCurrentVault] = useState<Vault | null>(null);
+    const [currentPhase, setCurrentPhase] = useState<Phase | null>(null);
 
     const handleLogout = async () => {
         try {
@@ -32,18 +38,18 @@ const AdminDashboard = () => {
         setIsEditing(true);
     };
 
-    const handleEdit = (vault) => {
+    const handleEdit = (vault: Vault) => {
         setCurrentVault(vault);
         setIsEditing(true);
     };
 
-    const handleDelete = (id) => {
+    const handleDelete = (id: string) => {
         if (window.confirm('Are you sure you want to delete this vault?')) {
             deleteVault(id);
         }
     };
 
-    const handleSubmit = (data) => {
+    const handleSubmit = (data: VaultInsert) => {
         if (currentVault) {
             updateVault(currentVault.id, data);
         } else {
@@ -53,7 +59,7 @@ const AdminDashboard = () => {
         setCurrentVault(null);
     };
 
-    const handlePhaseSubmit = async (phaseData, imageFile) => {
+    const handlePhaseSubmit = async (phaseData: Omit<PhaseInsert, 'image'> & { image: string }, imageFile: File | null) => {
         if (currentPhase) {
             await updatePhase(currentPhase.id, phaseData, imageFile);
             setCurrentPhase(null);
@@ -62,7 +68,7 @@ const AdminDashboard = () => {
         }
     };
 
-    const handlePhaseEdit = (phase) => {
+    const handlePhaseEdit = (phase: Phase) => {
         setCurrentPhase(phase);
     };
 
@@ -186,7 +192,7 @@ const AdminDashboard = () => {
                             <PhaseForm
                                 phase={currentPhase}
                                 onSubmit={handlePhaseSubmit}
-                                onCancel={currentPhase ? () => setCurrentPhase(null) : null}
+                                onCancel={currentPhase ? () => setCurrentPhase(null) : undefined}
                             />
                         </div>
                         <PhaseList onEdit={handlePhaseEdit} />

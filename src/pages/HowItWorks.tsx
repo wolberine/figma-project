@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import Carousel from '../components/Carousel';
 import { supabase } from '../lib/supabase';
+import { Database } from '../types/supabase';
 
-const HowItWorks = () => {
-    const [phases, setPhases] = useState([]);
+type Phase = Database['public']['Tables']['phases']['Row'];
+
+const HowItWorks: React.FC = () => {
+    const [phases, setPhases] = useState<Phase[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {

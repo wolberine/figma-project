@@ -13,7 +13,7 @@ export default function TransferDemo() {
                 <p className="text-center text-gray-400 mb-12 max-w-2xl mx-auto">
                     This component demonstrates how to transfer USDC/USDT from a connected wallet to the protocol on both Solana and Ethereum.
                 </p>
-                <TransferFunds />
+                <TransferFunds onClose={() => { }} />
             </div>
         </div>
     );

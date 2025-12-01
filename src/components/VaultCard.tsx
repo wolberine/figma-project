@@ -1,6 +1,6 @@
 import React from 'react';
 
-const VaultCard = () => {
+const VaultCard: React.FC = () => {
     return (
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-surface to-background border border-border p-8 shadow-2xl">
             {/* Background Decorative Elements */}

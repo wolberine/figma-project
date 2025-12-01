@@ -1,6 +1,18 @@
 import React from 'react';
 
-const FundCard = ({
+interface FundCardProps {
+    code: string;
+    title: string;
+    description: string;
+    apy: string;
+    incentivized?: boolean;
+    image?: string | null;
+    gradient?: string | null;
+    wide?: boolean;
+    onClick?: () => void;
+}
+
+const FundCard: React.FC<FundCardProps> = ({
     code,
     title,
     description,

@@ -1,7 +1,7 @@
 import React from 'react';
 import Layout from '../components/Layout';
 
-const Shipcoin = () => {
+const Shipcoin: React.FC = () => {
     return (
         <Layout>
             <div className="bg-black text-white min-h-screen">

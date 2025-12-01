@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, ChangeEvent } from 'react';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { Connection, PublicKey, Transaction } from '@solana/web3.js';
 import { createTransferInstruction, getAssociatedTokenAddress, createAssociatedTokenAccountInstruction } from '@solana/spl-token';
-import { createWalletClient, createPublicClient, http, custom, parseUnits, encodeFunctionData } from 'viem';
+import { createWalletClient, createPublicClient, http, custom, parseUnits, encodeFunctionData, Hash } from 'viem';
 import { mainnet, sepolia, base } from 'viem/chains';
 import { XMarkIcon, ArrowRightIcon, Cog6ToothIcon, CheckCircleIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 
@@ -10,7 +10,19 @@ const SOLANA_DESTINATION = 'B4bAbipNRXjtcbs78t6dBKWXwd4tkLu5kUvsH2Txds5J';
 // TODO: Replace with actual Ethereum destination address
 const ETHEREUM_DESTINATION = '0x0000000000000000000000000000000000000000';
 
-const TOKENS = {
+type Network = 'mainnet' | 'testnet';
+type Chain = 'solana' | 'ethereum' | 'base';
+type Token = 'USDC' | 'USDT';
+
+interface TokenAddresses {
+    [key: string]: {
+        [key: string]: {
+            [key: string]: string;
+        };
+    };
+}
+
+const TOKENS: TokenAddresses = {
     mainnet: {
         solana: {
             USDC: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
@@ -58,25 +70,32 @@ const ERC20_ABI = [
         ],
         outputs: [{ name: '', type: 'bool' }],
     },
-];
+] as const;
 
-export default function TransferFunds({ solanaDestinationAddress, ethereumDestinationAddress, baseDestinationAddress, onClose }) {
+interface TransferFundsProps {
+    solanaDestinationAddress?: string | null;
+    ethereumDestinationAddress?: string | null;
+    baseDestinationAddress?: string | null;
+    onClose: () => void;
+}
+
+export default function TransferFunds({ solanaDestinationAddress, ethereumDestinationAddress, baseDestinationAddress, onClose }: TransferFundsProps) {
     const { user, login } = usePrivy();
     const { wallets } = useWallets();
-    const [network, setNetwork] = useState('mainnet');
-    const [chain, setChain] = useState('solana');
-    const [token, setToken] = useState('USDC');
+    const [network, setNetwork] = useState<Network>('mainnet');
+    const [chain, setChain] = useState<Chain>('solana');
+    const [token, setToken] = useState<Token>('USDC');
     const [amount, setAmount] = useState('');
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState('');
     const [showSettings, setShowSettings] = useState(false);
 
     // 'idle' | 'submitting' | 'submitted' | 'confirmed'
-    const [transferState, setTransferState] = useState('idle');
+    const [transferState, setTransferState] = useState<'idle' | 'submitting' | 'submitted' | 'confirmed'>('idle');
     const [txHash, setTxHash] = useState('');
 
     // Determine target address based on selected chain
-    let targetAddress;
+    let targetAddress: string;
     if (chain === 'solana') {
         targetAddress = solanaDestinationAddress || SOLANA_DESTINATION;
     } else if (chain === 'base') {
@@ -124,7 +143,7 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
             } else {
                 await handleEthereumTransfer(wallet);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Transfer failed:', error);
             setStatus(`Transfer failed: ${error.message}`);
             setTransferState('idle');
@@ -133,9 +152,9 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
         }
     };
 
-    const handleSolanaTransfer = async (wallet) => {
+    const handleSolanaTransfer = async (wallet: any) => {
         if (wallet.walletClientType !== 'solana') {
-            if (!user.wallet?.address) {
+            if (!user?.wallet?.address) {
                 throw new Error("Please connect a Solana-compatible wallet.");
             }
         }
@@ -220,7 +239,7 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
         setStatus('Transfer successful!');
     };
 
-    const handleEthereumTransfer = async (wallet) => {
+    const handleEthereumTransfer = async (wallet: any) => {
         let targetChainId;
         let targetChain;
 
@@ -239,15 +258,15 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
         await new Promise(resolve => setTimeout(resolve, 2000));
 
         const provider = await wallet.getEthereumProvider();
-        const address = wallet.address;
+        const address = wallet.address as `0x${string}`;
 
         const client = createWalletClient({
             account: address,
             chain: targetChain,
-            transport: custom(provider, {
+            transport: custom(provider as any, {
                 retryCount: 3,
                 retryDelay: 1000
-            })
+            }) as any
         });
 
         const publicClient = createPublicClient({
@@ -255,7 +274,7 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
             transport: http()
         });
 
-        const tokenAddress = TOKENS[network][chain][token];
+        const tokenAddress = TOKENS[network][chain][token] as `0x${string}`;
         if (!tokenAddress) throw new Error(`Token ${token} not supported on ${chain} ${network}`);
 
         const amountBigInt = parseUnits(amount, 6);
@@ -263,16 +282,17 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
         const data = encodeFunctionData({
             abi: ERC20_ABI,
             functionName: 'transfer',
-            args: [targetAddress, amountBigInt]
+            args: [targetAddress as `0x${string}`, amountBigInt]
         });
 
         setStatus('Requesting signature...');
 
         // Retry logic for sending transaction
-        let hash;
+        let hash: Hash | undefined;
         let retries = 3;
         while (retries > 0) {
             try {
+                // @ts-ignore
                 hash = await client.sendTransaction({
                     account: address,
                     to: tokenAddress,
@@ -288,6 +308,8 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
             }
         }
 
+        if (!hash) throw new Error("Transaction failed to send");
+
         setTxHash(hash);
         setTransferState('submitted');
         setStatus('Transaction submitted. Waiting for confirmation...');
@@ -299,7 +321,7 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
     };
 
     // Format amount for display
-    const formatAmount = (value) => {
+    const formatAmount = (value: string) => {
         if (!value) return '';
         // Remove non-numeric chars except decimal
         const numericValue = value.replace(/[^0-9.]/g, '');
@@ -311,7 +333,7 @@ export default function TransferFunds({ solanaDestinationAddress, ethereumDestin
         return '$' + parts.join('.');
     };
 
-    const handleAmountChange = (e) => {
+    const handleAmountChange = (e: ChangeEvent<HTMLInputElement>) => {
         // Get raw value without formatting
         let value = e.target.value.replace(/[^0-9.]/g, '');
 

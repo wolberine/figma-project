@@ -1,12 +1,35 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { supabase } from '../lib/supabase';
+import { Database } from '../types/supabase';
 
-const PhaseContext = createContext();
+type Phase = Database['public']['Tables']['phases']['Row'];
+type PhaseInsert = Database['public']['Tables']['phases']['Insert'];
+type PhaseUpdate = Database['public']['Tables']['phases']['Update'];
 
-export const usePhases = () => useContext(PhaseContext);
+interface PhaseContextType {
+    phases: Phase[];
+    addPhase: (phaseData: Omit<PhaseInsert, 'image'> & { image: string }, imageFile?: File) => Promise<Phase>;
+    updatePhase: (id: string, phaseData: Partial<PhaseUpdate>, imageFile?: File) => Promise<void>;
+    deletePhase: (id: string) => Promise<void>;
+    loading: boolean;
+}
 
-export const PhaseProvider = ({ children }) => {
-    const [phases, setPhases] = useState([]);
+const PhaseContext = createContext<PhaseContextType | undefined>(undefined);
+
+export const usePhases = () => {
+    const context = useContext(PhaseContext);
+    if (context === undefined) {
+        throw new Error('usePhases must be used within a PhaseProvider');
+    }
+    return context;
+};
+
+interface PhaseProviderProps {
+    children: ReactNode;
+}
+
+export const PhaseProvider: React.FC<PhaseProviderProps> = ({ children }) => {
+    const [phases, setPhases] = useState<Phase[]>([]);
     const [loading, setLoading] = useState(true);
 
     const fetchPhases = async () => {
@@ -29,7 +52,7 @@ export const PhaseProvider = ({ children }) => {
         fetchPhases();
     }, []);
 
-    const uploadImage = async (file) => {
+    const uploadImage = async (file: File) => {
         try {
             const fileExt = file.name.split('.').pop();
             const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
@@ -52,7 +75,7 @@ export const PhaseProvider = ({ children }) => {
         }
     };
 
-    const deleteImage = async (imageUrl) => {
+    const deleteImage = async (imageUrl: string) => {
         try {
             // Extract file path from URL
             const urlParts = imageUrl.split('/');
@@ -68,7 +91,7 @@ export const PhaseProvider = ({ children }) => {
         }
     };
 
-    const addPhase = async (phaseData, imageFile) => {
+    const addPhase = async (phaseData: Omit<PhaseInsert, 'image'> & { image: string }, imageFile?: File) => {
         try {
             let imageUrl = phaseData.image;
 
@@ -78,19 +101,22 @@ export const PhaseProvider = ({ children }) => {
 
             const { data, error } = await supabase
                 .from('phases')
-                .insert([{ ...phaseData, image: imageUrl }])
+                .insert([{ ...phaseData, image: imageUrl }] as any)
                 .select();
 
             if (error) throw error;
-            setPhases([...phases, data[0]].sort((a, b) => a.step_number - b.step_number));
-            return data[0];
+            if (data) {
+                setPhases([...phases, data[0]].sort((a, b) => a.step_number - b.step_number));
+                return data[0];
+            }
+            throw new Error('Failed to add phase');
         } catch (error) {
             console.error('Error adding phase:', error);
             throw error;
         }
     };
 
-    const updatePhase = async (id, phaseData, imageFile) => {
+    const updatePhase = async (id: string, phaseData: Partial<PhaseUpdate>, imageFile?: File) => {
         try {
             const oldPhase = phases.find(p => p.id === id);
             let imageUrl = phaseData.image;
@@ -105,18 +131,19 @@ export const PhaseProvider = ({ children }) => {
 
             const { error } = await supabase
                 .from('phases')
-                .update({ ...phaseData, image: imageUrl })
+                // @ts-ignore
+                .update({ ...phaseData, image: imageUrl } as any)
                 .eq('id', id);
 
             if (error) throw error;
-            setPhases(phases.map(p => p.id === id ? { ...p, ...phaseData, image: imageUrl } : p));
+            setPhases(phases.map(p => p.id === id ? { ...p, ...phaseData, image: imageUrl } as Phase : p));
         } catch (error) {
             console.error('Error updating phase:', error);
             throw error;
         }
     };
 
-    const deletePhase = async (id) => {
+    const deletePhase = async (id: string) => {
         try {
             const phase = phases.find(p => p.id === id);
 

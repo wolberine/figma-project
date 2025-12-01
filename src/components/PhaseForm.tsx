@@ -1,25 +1,39 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import { Database } from '../types/supabase';
 
-const PhaseForm = ({ phase, onSubmit, onCancel }) => {
-    const [formData, setFormData] = useState({
-        id: '',
+type Phase = Database['public']['Tables']['phases']['Row'];
+type PhaseInsert = Database['public']['Tables']['phases']['Insert'];
+
+interface PhaseFormProps {
+    phase: Phase | null;
+    onSubmit: (data: Omit<PhaseInsert, 'image'> & { image: string }, file: File | null) => Promise<void>;
+    onCancel?: () => void;
+}
+
+const PhaseForm: React.FC<PhaseFormProps> = ({ phase, onSubmit, onCancel }) => {
+    const [formData, setFormData] = useState<Omit<PhaseInsert, 'image'> & { image: string }>({
         step_number: 0,
         title: '',
         description: '',
         image: ''
     });
-    const [imageFile, setImageFile] = useState(null);
-    const [imagePreview, setImagePreview] = useState('');
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string>('');
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (phase) {
-            setFormData(phase);
+            setFormData({
+                step_number: phase.step_number,
+                title: phase.title,
+                description: phase.description,
+                image: phase.image
+            });
             setImagePreview(phase.image);
         }
     }, [phase]);
 
-    const handleChange = (e) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
@@ -27,8 +41,8 @@ const PhaseForm = ({ phase, onSubmit, onCancel }) => {
         }));
     };
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
+    const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
         if (file) {
             // Validate file type
             if (!file.type.startsWith('image/')) {
@@ -47,14 +61,13 @@ const PhaseForm = ({ phase, onSubmit, onCancel }) => {
         }
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setLoading(true);
         try {
             await onSubmit(formData, imageFile);
             // Reset form
             setFormData({
-                id: '',
                 step_number: 0,
                 title: '',
                 description: '',
@@ -62,7 +75,7 @@ const PhaseForm = ({ phase, onSubmit, onCancel }) => {
             });
             setImageFile(null);
             setImagePreview('');
-        } catch (error) {
+        } catch (error: any) {
             alert('Error saving phase: ' + error.message);
         } finally {
             setLoading(false);
@@ -114,7 +127,7 @@ const PhaseForm = ({ phase, onSubmit, onCancel }) => {
                     value={formData.description}
                     onChange={handleChange}
                     required
-                    rows="3"
+                    rows={3}
                     placeholder="Describe this step..."
                     className="w-full bg-black border border-white/10 px-4 py-2 text-white focus:outline-none focus:border-gold resize-none"
                 />

@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
 
-const Login = () => {
+const Login: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -11,7 +11,7 @@ const Login = () => {
     const { login } = useAuth();
     const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setError('');
         setLoading(true);

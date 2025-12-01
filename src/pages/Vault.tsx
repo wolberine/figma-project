@@ -4,11 +4,11 @@ import Layout from '../components/Layout';
 import FundCard from '../components/FundCard';
 import { useVaults } from '../context/VaultContext';
 
-const Vault = () => {
+const Vault: React.FC = () => {
     const navigate = useNavigate();
     const { vaults } = useVaults();
 
-    const handleVaultClick = (vaultId) => {
+    const handleVaultClick = (vaultId: string) => {
         navigate(`/vault/${vaultId}`);
     };
 
@@ -18,7 +18,7 @@ const Vault = () => {
     const guarantor = vaults.filter(v => v.category === 'guarantor');
 
     // Gradient mapping for specific vaults
-    const getGradient = (code) => {
+    const getGradient = (code: string) => {
         switch (code) {
             // NMCXO: High Contrast Blue-Grey (Brighter start, Darker end)
             case 'NMCXO': return 'bg-[linear-gradient(135deg,_#64748b_0%,_#020617_100%)]';

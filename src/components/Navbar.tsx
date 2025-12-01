@@ -1,9 +1,10 @@
+import React from 'react';
 import { usePrivy } from '@privy-io/react-auth';
 
-const Navbar = () => {
+const Navbar: React.FC = () => {
     const { login, logout, authenticated, user } = usePrivy();
 
-    const formatAddress = (address) => {
+    const formatAddress = (address: string | undefined) => {
         if (!address) return '';
         return `${address.slice(0, 6)}...${address.slice(-4)}`;
     };

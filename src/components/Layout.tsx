@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
 
-const Layout = ({ children }) => {
+interface LayoutProps {
+    children: ReactNode;
+}
+
+const Layout: React.FC<LayoutProps> = ({ children }) => {
     return (
         <div className="min-h-screen bg-background text-white font-sans selection:bg-gold selection:text-black flex flex-col">
             <Navbar />

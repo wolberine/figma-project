@@ -1,6 +1,14 @@
 import React from 'react';
+import { Database } from '../types/supabase';
 
-const VaultDetailModal = ({ asset, onClose }) => {
+type Vault = Database['public']['Tables']['vaults']['Row'];
+
+interface VaultDetailModalProps {
+    asset: Vault | null;
+    onClose: () => void;
+}
+
+const VaultDetailModal: React.FC<VaultDetailModalProps> = ({ asset, onClose }) => {
     if (!asset) return null;
 
     return (
@@ -18,7 +26,7 @@ const VaultDetailModal = ({ asset, onClose }) => {
                 <div className="w-full md:w-1/2 p-12 border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-between bg-background">
                     <div>
                         <div className="text-gold text-xs font-bold tracking-widest uppercase mb-6">{asset.code || 'NMCXX'}</div>
-                        <h2 className="font-serif italic text-4xl md:text-5xl mb-6 leading-tight">{asset.title || asset.name}</h2>
+                        <h2 className="font-serif italic text-4xl md:text-5xl mb-6 leading-tight">{asset.title}</h2>
                         <p className="text-secondary text-sm leading-relaxed mb-8">
                             {asset.description || 'A curated vault booking a diversified set of global commodity trades without fees or extended lockup times.'}
                         </p>

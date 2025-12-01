@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
+import { Database } from '../types/supabase';
 
-const Carousel = ({ items }) => {
+type Phase = Database['public']['Tables']['phases']['Row'];
+
+interface CarouselProps {
+    items: Phase[];
+}
+
+const Carousel: React.FC<CarouselProps> = ({ items }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     const nextSlide = () => {

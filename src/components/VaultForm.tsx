@@ -1,7 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import { Database } from '../types/supabase';
 
-const VaultForm = ({ initialData, onSubmit, onCancel }) => {
-    const [formData, setFormData] = useState({
+type Vault = Database['public']['Tables']['vaults']['Row'];
+type VaultInsert = Database['public']['Tables']['vaults']['Insert'];
+
+interface VaultFormProps {
+    initialData: Vault | null;
+    onSubmit: (data: VaultInsert) => void;
+    onCancel: () => void;
+}
+
+const VaultForm: React.FC<VaultFormProps> = ({ initialData, onSubmit, onCancel }) => {
+    const [formData, setFormData] = useState<VaultInsert>({
         code: '',
         title: '',
         description: '',
@@ -10,7 +20,10 @@ const VaultForm = ({ initialData, onSubmit, onCancel }) => {
         inception: '',
         risk: '',
         category: 'customized',
-        incentivized: false
+        incentivized: false,
+        solana_wallet_address: '',
+        ethereum_wallet_address: '',
+        base_wallet_address: ''
     });
 
     useEffect(() => {
@@ -19,15 +32,17 @@ const VaultForm = ({ initialData, onSubmit, onCancel }) => {
         }
     }, [initialData]);
 
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value, type } = e.target;
+        const checked = (e.target as HTMLInputElement).checked;
+
         setFormData(prev => ({
             ...prev,
             [name]: type === 'checkbox' ? checked : value
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         onSubmit(formData);
     };
@@ -194,7 +209,7 @@ const VaultForm = ({ initialData, onSubmit, onCancel }) => {
                     value={formData.description}
                     onChange={handleChange}
                     required
-                    rows="4"
+                    rows={4}
                     className="w-full bg-black border border-white/20 text-white px-4 py-3 focus:border-gold outline-none transition-colors"
                     placeholder="Brief description of the vault strategy..."
                 ></textarea>

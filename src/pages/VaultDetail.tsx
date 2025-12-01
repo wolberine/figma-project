@@ -4,12 +4,12 @@ import Layout from '../components/Layout';
 import { useVaults } from '../context/VaultContext';
 import TransferFunds from '../components/TransferFunds';
 
-const VaultDetail = () => {
-    const { id } = useParams();
+const VaultDetail: React.FC = () => {
+    const { id } = useParams<{ id: string }>();
     const { getVault, loading } = useVaults();
     const [showTransferModal, setShowTransferModal] = useState(false);
 
-    const vaultData = getVault(id);
+    const vaultData = id ? getVault(id) : undefined;
 
     // Show loading state while data is being fetched
     if (loading) {

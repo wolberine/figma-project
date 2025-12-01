@@ -1,12 +1,36 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { supabase } from '../lib/supabase';
+import { Database } from '../types/supabase';
 
-const VaultContext = createContext();
+type Vault = Database['public']['Tables']['vaults']['Row'];
+type VaultInsert = Database['public']['Tables']['vaults']['Insert'];
+type VaultUpdate = Database['public']['Tables']['vaults']['Update'];
 
-export const useVaults = () => useContext(VaultContext);
+interface VaultContextType {
+    vaults: Vault[];
+    addVault: (newVault: VaultInsert) => Promise<void>;
+    updateVault: (id: string, updatedData: VaultUpdate) => Promise<void>;
+    deleteVault: (id: string) => Promise<void>;
+    getVault: (id: string) => Vault | undefined;
+    loading: boolean;
+}
 
-export const VaultProvider = ({ children }) => {
-    const [vaults, setVaults] = useState([]);
+const VaultContext = createContext<VaultContextType | undefined>(undefined);
+
+export const useVaults = () => {
+    const context = useContext(VaultContext);
+    if (context === undefined) {
+        throw new Error('useVaults must be used within a VaultProvider');
+    }
+    return context;
+};
+
+interface VaultProviderProps {
+    children: ReactNode;
+}
+
+export const VaultProvider: React.FC<VaultProviderProps> = ({ children }) => {
+    const [vaults, setVaults] = useState<Vault[]>([]);
     const [loading, setLoading] = useState(true);
 
     const fetchVaults = async () => {
@@ -29,37 +53,40 @@ export const VaultProvider = ({ children }) => {
         fetchVaults();
     }, []);
 
-    const addVault = async (newVault) => {
+    const addVault = async (newVault: VaultInsert) => {
         try {
             const { data, error } = await supabase
                 .from('vaults')
-                .insert([{ ...newVault, id: newVault.code.toLowerCase() }])
+                .insert([{ ...newVault, id: newVault.code.toLowerCase() }] as any)
                 .select();
 
             if (error) throw error;
-            setVaults([...vaults, data[0]]);
+            if (data) {
+                setVaults([...vaults, data[0]]);
+            }
         } catch (error) {
             console.error('Error adding vault:', error);
             alert('Error adding vault');
         }
     };
 
-    const updateVault = async (id, updatedData) => {
+    const updateVault = async (id: string, updatedData: VaultUpdate) => {
         try {
             const { error } = await supabase
                 .from('vaults')
-                .update(updatedData)
+                // @ts-ignore
+                .update(updatedData as any)
                 .eq('id', id);
 
             if (error) throw error;
-            setVaults(vaults.map(v => v.id === id ? { ...v, ...updatedData } : v));
+            setVaults(vaults.map(v => v.id === id ? { ...v, ...updatedData } as Vault : v));
         } catch (error) {
             console.error('Error updating vault:', error);
             alert('Error updating vault');
         }
     };
 
-    const deleteVault = async (id) => {
+    const deleteVault = async (id: string) => {
         try {
             const { error } = await supabase
                 .from('vaults')
@@ -74,7 +101,7 @@ export const VaultProvider = ({ children }) => {
         }
     };
 
-    const getVault = (id) => vaults.find(v => v.id === id);
+    const getVault = (id: string) => vaults.find(v => v.id === id);
 
     return (
         <VaultContext.Provider value={{ vaults, addVault, updateVault, deleteVault, getVault, loading }}>

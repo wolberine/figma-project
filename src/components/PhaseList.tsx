@@ -1,16 +1,23 @@
 import React, { useState } from 'react';
 import { usePhases } from '../context/PhaseContext';
+import { Database } from '../types/supabase';
 
-const PhaseList = ({ onEdit }) => {
+type Phase = Database['public']['Tables']['phases']['Row'];
+
+interface PhaseListProps {
+    onEdit: (phase: Phase) => void;
+}
+
+const PhaseList: React.FC<PhaseListProps> = ({ onEdit }) => {
     const { phases, deletePhase, loading } = usePhases();
-    const [deleting, setDeleting] = useState(null);
+    const [deleting, setDeleting] = useState<string | null>(null);
 
-    const handleDelete = async (id) => {
+    const handleDelete = async (id: string) => {
         setDeleting(id);
 
         try {
             await deletePhase(id);
-        } catch (error) {
+        } catch (error: any) {
             alert('Error deleting phase: ' + error.message);
         } finally {
             setDeleting(null);

@@ -1,13 +1,26 @@
 import React from 'react';
 
-const assets = [
+export interface Asset {
+    id: number;
+    name: string;
+    symbol: string;
+    balance: string;
+    value: string;
+    apy: string;
+}
+
+const assets: Asset[] = [
     { id: 1, name: 'Bitcoin', symbol: 'BTC', balance: '1.245', value: '$45,230.00', apy: '5.2%' },
     { id: 2, name: 'Ethereum', symbol: 'ETH', balance: '14.52', value: '$32,400.00', apy: '4.8%' },
     { id: 3, name: 'USDC', symbol: 'USDC', balance: '45,000.00', value: '$45,000.00', apy: '12.5%' },
     { id: 4, name: 'Solana', symbol: 'SOL', balance: '245.00', value: '$14,230.00', apy: '6.5%' },
 ];
 
-const AssetList = ({ onSelectAsset }) => {
+interface AssetListProps {
+    onSelectAsset: (asset: Asset) => void;
+}
+
+const AssetList: React.FC<AssetListProps> = ({ onSelectAsset }) => {
     return (
         <div className="bg-surface border border-border rounded-3xl overflow-hidden">
             <div className="p-6 border-b border-border">
