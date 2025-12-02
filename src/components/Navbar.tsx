@@ -11,13 +11,10 @@ const Navbar: React.FC = () => {
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-white/5">
-            <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div className="grid grid-cols-[1fr_max-content_1fr] max-w-7xl mx-auto px-6 h-20 items-center">
                 {/* Logo */}
                 <div className="flex items-center gap-2">
-                    <div className="text-2xl font-serif text-white tracking-wider">N</div>
-                    <div className="text-xs text-secondary tracking-[0.2em] uppercase hidden sm:block font-kicker">
-                        The New<br />Money Company
-                    </div>
+                    <img src="/n-mark.svg" alt="New Money Company logo" className="w-10 h-10" />
                 </div>
 
                 {/* Center Links */}
@@ -28,7 +25,7 @@ const Navbar: React.FC = () => {
                 </div>
 
                 {/* Right Actions */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center justify-end gap-4">
                     {authenticated && user?.wallet ? (
                         <div className="flex items-center gap-4">
                             <span className="text-xs font-mono text-gold">

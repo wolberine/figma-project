@@ -10,7 +10,7 @@ export default {
         sans: ['suisse-intl', 'sans-serif'],
         mono: ['suisse-intl-mono', 'monospace'],
         kicker: ['bank-gothic', 'sans-serif'],
-        serif: ['Playfair Display', 'serif'],
+        serif: ['suisse-works', 'serif'],
       },
       colors: {
         background: '#050505',
